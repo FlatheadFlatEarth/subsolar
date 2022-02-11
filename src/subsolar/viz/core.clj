@@ -14,7 +14,7 @@
 
 (def sizes
   {
-   :person [29 75]
+   :person [75 29]
    :earth [200 200]
    :sun [200 200]
    })
@@ -37,19 +37,20 @@
         leg-length 35]
     (when (q/loaded? im)
       (q/image im
-               (- (/ width 2))
-               (- (- (/ height 2))
-                  (/ (-> sizes
-                         :earth
-                         last)
-                     2)
-                  leg-length)))))
+               ;;(- (/ width 2))
+               (/ (-> sizes
+                      :earth
+                      last)
+                  2)
+               (- (/ height 2))
+               ))))
+
 (defn draw-earth []
   (q/stroke 0 255 0)
-  ;;(q/rect 50 50 50 50)
+  ;; (q/rect 50 50 50 50)
   (with-translation [300 500]
-    ;;(with-rotation [(/ (q/frame-count) 30)]
       (with-rotation [(q/state :earth/rotation)]
+        ;;(with-rotation [0]
       (let [im (q/state :image/earth)
             [width height] (:earth sizes)]
         (when (q/loaded? im)
@@ -67,12 +68,39 @@
 
 (defn draw-angle-to-sun []
   (q/stroke 200 0 0)
-  (q/line 300 150 300 400))
+
+  (let [
+        [spx spy] (:sun positions)
+        ;; [ssx ssy] (:sun sizes)
+
+        [epx epy] (:earth positions)
+        [esx esy] (:earth sizes)
+
+        angle (q/state :earth/rotation)
+        h (/ esy 2)]
+
+    (q/line spx spy
+            (+ epx
+               (* h (q/cos angle)))
+            (+ epy
+               (* h (q/sin angle)))
+            )))
 
 (defn draw-tangent-line []
   (q/stroke 0 200 0)
-  (q/line 150 400 450 400)
-  )
+  (let [[epx epy] (:earth positions)
+        [esx esy] (:earth sizes)
+        angle (q/state :earth/rotation)]
+
+
+    ;; Perpendicular slopes must be opposite reciprocals of each other:  m1 * m2 = –1
+
+    (q/tan angle)
+    (q/line 150 400
+
+            450 400
+            )
+    ))
 
 (defn draw-lines []
   (q/stroke 66)
@@ -98,7 +126,7 @@
 
   (draw-lines)
 
-  ;;(swap! (q/state-atom) update :earth/rotation #(+ 0.012 %))
+  (swap! (q/state-atom) update :earth/rotation #(+ 0.012 %))
   )
 
 (defn on-close []
