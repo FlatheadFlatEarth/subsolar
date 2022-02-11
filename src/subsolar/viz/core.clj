@@ -7,18 +7,13 @@
 (def window-height 720)
 
 (def positions
-  {
-   :sun   [300 150]
-   :earth [300 500]
-   })
+  {:earth [300 500]
+   :sun   [300 150]})
 
 (def sizes
-  {
+  {:earth [200 200]
    :person [75 29]
-   :earth [200 200]
-   :sun [200 200]
-   })
-
+   :sun [200 200]})
 
 (defn setup []
   (q/frame-rate 30)
@@ -45,10 +40,8 @@
 
 (defn draw-earth []
   (q/stroke 0 255 0)
-  ;; (q/rect 50 50 50 50)
   (with-translation [300 500]
       (with-rotation [(q/state :earth/rotation)]
-        ;;(with-rotation [0]
       (let [im (q/state :image/earth)
             [width height] (:earth sizes)]
         (when (q/loaded? im)
@@ -61,28 +54,25 @@
     (when (q/loaded? im)
       (q/image im 200 50))))
 
+(defn draw-distance-to-core []
+
+  )
+
 (defn draw-intersolar-distance []
   (q/line 300 150 300 500))
 
 (defn draw-angle-to-sun []
   (q/stroke 200 0 0)
-
-  (let [
-        [spx spy] (:sun positions)
-        ;; [ssx ssy] (:sun sizes)
-
+  (let [[spx spy] (:sun positions)
         [epx epy] (:earth positions)
         [esx esy] (:earth sizes)
-
         angle (q/state :earth/rotation)
         h (/ esy 2)]
-
     (q/line spx spy
             (+ epx
                (* h (q/cos angle)))
             (+ epy
-               (* h (q/sin angle)))
-            )))
+               (* h (q/sin angle))))))
 
 (defn draw-tangent-line []
   (q/stroke 0 200 0)
@@ -93,9 +83,7 @@
     (with-translation [300 500]
       (with-rotation [(q/state :earth/rotation)]
         (q/tan angle)
-        ;;(q/line 150 400 450 400)
-        (q/line 100 -150 100 150)
-        ))))
+        (q/line 100 -150 100 150)))))
 
 (defn draw-lines []
   (q/stroke 66)
@@ -103,6 +91,7 @@
   (draw-intersolar-distance)
   (draw-tangent-line)
   (draw-angle-to-sun)
+  (draw-distance-to-core)
   )
 
 (defn draw []
@@ -111,11 +100,9 @@
   (q/rect 0 0 window-width window-height)
 
   (q/fill 255)
-  (q/text "hello world" 5 15)
 
   (draw-sun)
   (draw-earth)
-
   (draw-lines)
 
   ;;(swap! (q/state-atom) update :earth/rotation #(+ 0.012 %))
