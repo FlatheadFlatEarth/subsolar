@@ -37,13 +37,11 @@
         leg-length 35]
     (when (q/loaded? im)
       (q/image im
-               ;;(- (/ width 2))
                (/ (-> sizes
                       :earth
                       last)
                   2)
-               (- (/ height 2))
-               ))))
+               (- (/ height 2))))))
 
 (defn draw-earth []
   (q/stroke 0 255 0)
@@ -91,16 +89,13 @@
   (let [[epx epy] (:earth positions)
         [esx esy] (:earth sizes)
         angle (q/state :earth/rotation)]
-
-
     ;; Perpendicular slopes must be opposite reciprocals of each other:  m1 * m2 = –1
-
-    (q/tan angle)
-    (q/line 150 400
-
-            450 400
-            )
-    ))
+    (with-translation [300 500]
+      (with-rotation [(q/state :earth/rotation)]
+        (q/tan angle)
+        ;;(q/line 150 400 450 400)
+        (q/line 100 -150 100 150)
+        ))))
 
 (defn draw-lines []
   (q/stroke 66)
@@ -108,9 +103,6 @@
   (draw-intersolar-distance)
   (draw-tangent-line)
   (draw-angle-to-sun)
-
-  ;; calculate location of person
-
   )
 
 (defn draw []
@@ -126,7 +118,7 @@
 
   (draw-lines)
 
-  (swap! (q/state-atom) update :earth/rotation #(+ 0.012 %))
+  ;;(swap! (q/state-atom) update :earth/rotation #(+ 0.012 %))
   )
 
 (defn on-close []
