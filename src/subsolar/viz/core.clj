@@ -26,6 +26,7 @@
   (q/stroke 255)
   (q/stroke-weight 2)
   (q/set-state!
+   :earth/rotation 0.1
    :image/earth    (q/load-image "resources/img/earth.png" )
    :image/person   (q/load-image "resources/img/person.png")
    :image/sun      (q/load-image "resources/img/sun.png"   )))
@@ -48,7 +49,7 @@
   ;;(q/rect 50 50 50 50)
   (with-translation [300 500]
     ;;(with-rotation [(/ (q/frame-count) 30)]
-      (with-rotation [0]
+      (with-rotation [(q/state :earth/rotation)]
       (let [im (q/state :image/earth)
             [width height] (:earth sizes)]
         (when (q/loaded? im)
@@ -96,6 +97,8 @@
   (draw-earth)
 
   (draw-lines)
+
+  ;;(swap! (q/state-atom) update :earth/rotation #(+ 0.012 %))
   )
 
 (defn on-close []
