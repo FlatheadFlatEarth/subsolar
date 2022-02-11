@@ -47,7 +47,8 @@
   (q/stroke 0 255 0)
   ;;(q/rect 50 50 50 50)
   (with-translation [300 500]
-    (with-rotation [(/ (q/frame-count) 30)]
+    ;;(with-rotation [(/ (q/frame-count) 30)]
+      (with-rotation [0]
       (let [im (q/state :image/earth)
             [width height] (:earth sizes)]
         (when (q/loaded? im)
@@ -60,10 +61,28 @@
     (when (q/loaded? im)
       (q/image im 200 50))))
 
+(defn draw-intersolar-distance []
+  (q/line 300 150 300 500))
+
+(defn draw-angle-to-sun []
+  (q/stroke 200 0 0)
+  (q/line 300 150 300 400))
+
+(defn draw-tangent-line []
+  (q/stroke 0 200 0)
+  (q/line 150 400 450 400)
+  )
+
 (defn draw-lines []
-  (q/line
-    300 150
-    300 500))
+  (q/stroke 66)
+
+  (draw-intersolar-distance)
+  (draw-tangent-line)
+  (draw-angle-to-sun)
+
+  ;; calculate location of person
+
+  )
 
 (defn draw []
   (q/stroke 255)
@@ -76,8 +95,7 @@
   (draw-sun)
   (draw-earth)
 
-  ;; (draw-lines)
-
+  (draw-lines)
   )
 
 (defn on-close []
