@@ -146,15 +146,17 @@
       (text "Line of Sight" 5 0))
 
     (with-translation [fx fy]
-      (if tan-gt-pi
-        (arc 0 0 25 25
-             (- collated-observed-sun-angle)
-             (+ (* -2 PI)
-                tan-angle))
-        (arc 0 0 25 25
-             (+ (radians 180)
-                tan-angle)
-             (+ PI collated-observed-sun-angle)))
+      (when (or (> tan-angle (radians 270))
+                (< tan-angle (radians 90)))
+        (if tan-gt-pi
+          (arc 0 0 25 25
+               (- collated-observed-sun-angle)
+               (+ (* -2 PI)
+                  tan-angle))
+          (arc 0 0 25 25
+               (+ (radians 180)
+                  tan-angle)
+               (+ PI collated-observed-sun-angle))))
       (with-rotation [tan-angle]
         (text (format "Sun angle: %.02f"             (degrees sun-angle)) -90 -5)
         (text (format "Observed sun angle: %.02f"    (degrees observed-sun-angle)) -90 -25)
