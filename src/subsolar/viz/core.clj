@@ -1,6 +1,10 @@
 (ns subsolar.viz.core
   (:require [clojure.java.io :as io]
             [quil.core :as q :refer [
+                                     atan
+                                     asin
+                                     acos
+
                                      fill
                                      rect
                                      frame-rate
@@ -35,6 +39,7 @@
   (stroke-weight 2)
   (set-state!
    :earth/rotation 0.1
+   :status/playing? true
    :image/earth    (load-image "resources/img/earth.png" )
    :image/person   (load-image "resources/img/person.png")
    :image/sun      (load-image "resources/img/sun.png"   )))
@@ -111,18 +116,42 @@
   (stroke 200 0 0)
   (let [[spx spy] (:sun positions)
         [fx fy] (feet-location)
-        ;; angle
+
+        ;;tan-angle (atan
+        at 1.33
+        at-deg 76.16
+
+        sun-angle
+        (atan
+         ;;(/ (- spy fy)
+         ;;   (- spx fx)))
+                      (/ (- fy spy)
+                         (- fx spx)))
         ]
 
-    (line spx spy fx fy)
+    ;;(println "sun: " (:sun positions))
+    ;;(println "feet: " [fx fy])
 
-    (arc 100 100 50 50 3.14 6.28)
+    (line spx spy fx fy)
 
     (with-translation [(/ (+ fx spx) 2) (/ (+ fy spy) 2)]
       (text "Line of Sight" 5 0))
     (with-translation [fx fy]
+      ;;(with-rotation [(state :earth/rotation)]
+
+      ;;  )
       (with-rotation [(+ (state :earth/rotation)
                          (/ PI 2))]
+        (arc 0 0 25 25
+             ;;(radians 180)
+             ;;(radians 210)
+             ;;0
+             ;;sun-angle
+
+             (radians 180)
+             (+ (radians 180)
+                (- (radians 90)
+                   sun-angle)))
         (text "Sun angle: "
                 -90
                 -5
@@ -153,7 +182,28 @@
   (draw-distance-to-core)
   )
 
+(defn demo-key-input []
+  (doseq [[ind capt fn] [[0 "key-as-keyword" q/key-as-keyword]
+                         [1 "key-code" q/key-code]
+                         [2 "key-coded?" (fn* [] (q/key-coded? (q/raw-key)))]
+                         [3 "key-pressed?" q/key-pressed?] [4 "raw-key" q/raw-key]
+                         [5 "key-modifiers" q/key-modifiers]]]
+    (q/text (str capt " " (fn))
+            10
+            (+ (* 20 ind) 20))))
+
+(defn toggle-pause! []
+  (println "toggling pause")
+  (swap! (state-atom) update :status/playing? not))
+
+(defn get-key-input []
+  (when (q/key-pressed?)
+    (if (= (q/key-as-keyword) :space)
+      (toggle-pause!)
+      (println "key was: " (q/key-as-keyword)))))
+
 (defn draw []
+
   (stroke 255)
   (fill background-color)
   (rect 0 0 window-width window-height)
@@ -164,7 +214,10 @@
   (draw-earth)
   (draw-lines)
 
-  (swap! (state-atom) update :earth/rotation #(+ 0.012 %))
+  (when (state :status/playing?)
+    (swap! (state-atom) update :earth/rotation #(+ 0.012 %)))
+
+  (get-key-input)
   )
 
 (defn on-close []
