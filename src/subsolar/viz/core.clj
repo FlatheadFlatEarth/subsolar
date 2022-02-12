@@ -129,58 +129,37 @@
          ;;   (- spx fx)))
                       (/ (- fy spy)
                          (- fx spx)))
+
         observed-sun-angle (mod (- sun-angle tan-angle)
-                                (* PI 2))
-        ]
+                                (/ PI 2))
+
+        lh-observed-sun-angle (mod (- tan-angle sun-angle)
+                                (/ PI 2))
+
+        tan-gt-pi (> tan-angle PI)
+        collated-observed-sun-angle (if tan-gt-pi
+                                      lh-observed-sun-angle
+                                      observed-sun-angle)]
     (line spx spy fx fy)
 
     (with-translation [(/ (+ fx spx) 2) (/ (+ fy spy) 2)]
       (text "Line of Sight" 5 0))
 
     (with-translation [fx fy]
-      (with-rotation [
-                      (+
-                       (state :earth/rotation)
-                       (/ (* 3 PI) 2)
-                       )
-
-                      ]
-
-             ;;0
-             ;;sun-angle
-
-             ;;0
-             ;;   (- (radians 90)
-        ;;      sun-angle))
-
+      (if tan-gt-pi
         (arc 0 0 25 25
-             ;; hypothesis: use tan angle and sun angle
-
-             0
-             observed-sun-angle
-
-             ;;tan-angle
-             ;;sun-angle
-
-             ;;(radians 0)
-             ;;(radians 90)
-
-             ;;(radians 270)
-             ;;(+ (radians 270) observed-sun-angle)
-             ;;(radians 300)
-
-             ;;(+ (radians 180) tan-angle)
-             ;;(+ (radians 180) sun-angle)
-
-             )
-
-        )
-
+             (- collated-observed-sun-angle)
+             (+ (* -2 PI)
+                tan-angle))
+        (arc 0 0 25 25
+             (+ (radians 180)
+                tan-angle)
+             (+ PI collated-observed-sun-angle)))
       (with-rotation [tan-angle]
-
-
-        (text (format "Sun angle: %.02f" (degrees sun-angle)) -90 -5)
-        (text (format "Observed sun angle: %.02f" (degrees observed-sun-angle)) -90 -25)
+        (text (format "Sun angle: %.02f"             (degrees sun-angle)) -90 -5)
+        (text (format "Observed sun angle: %.02f"    (degrees observed-sun-angle)) -90 -25)
+        (text (format "LH Observed sun angle: %.02f" (degrees lh-observed-sun-angle)) -90 -45)
+        (text (format "Collated Observed sun angle: %.02f" (degrees collated-observed-sun-angle)) -90 -70)
         ))))
 
 (defn draw-tangent-line []
