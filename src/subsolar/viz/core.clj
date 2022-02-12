@@ -117,7 +117,9 @@
   (let [[spx spy] (:sun positions)
         [fx fy] (feet-location)
 
-        ;;tan-angle (atan
+        tan-angle (mod (+ (state :earth/rotation)
+                          (/ PI 2))
+                       (* PI 2))
         at 1.33
         at-deg 76.16
 
@@ -127,48 +129,72 @@
          ;;   (- spx fx)))
                       (/ (- fy spy)
                          (- fx spx)))
+        observed-sun-angle (mod (- sun-angle tan-angle)
+                                (* PI 2))
         ]
-
-    ;;(println "sun: " (:sun positions))
-    ;;(println "feet: " [fx fy])
-
     (line spx spy fx fy)
 
     (with-translation [(/ (+ fx spx) 2) (/ (+ fy spy) 2)]
       (text "Line of Sight" 5 0))
-    (with-translation [fx fy]
-      ;;(with-rotation [(state :earth/rotation)]
 
-      ;;  )
-      (with-rotation [(+ (state :earth/rotation)
-                         (/ PI 2))]
-        (arc 0 0 25 25
-             ;;(radians 180)
-             ;;(radians 210)
+    (with-translation [fx fy]
+      (with-rotation [
+                      (+
+                       (state :earth/rotation)
+                       (/ (* 3 PI) 2)
+                       )
+
+                      ]
+
              ;;0
              ;;sun-angle
 
-             (radians 180)
-             (+ (radians 180)
-                (- (radians 90)
-                   sun-angle)))
-        (text "Sun angle: "
-                -90
-                -5
-                ;;(+ fx 5)
-                ;;(- fy 5)
-                )))))
+             ;;0
+             ;;   (- (radians 90)
+        ;;      sun-angle))
+
+        (arc 0 0 25 25
+             ;; hypothesis: use tan angle and sun angle
+
+             0
+             observed-sun-angle
+
+             ;;tan-angle
+             ;;sun-angle
+
+             ;;(radians 0)
+             ;;(radians 90)
+
+             ;;(radians 270)
+             ;;(+ (radians 270) observed-sun-angle)
+             ;;(radians 300)
+
+             ;;(+ (radians 180) tan-angle)
+             ;;(+ (radians 180) sun-angle)
+
+             )
+
+        )
+
+      (with-rotation [tan-angle]
+
+
+        (text (format "Sun angle: %.02f" (degrees sun-angle)) -90 -5)
+        (text (format "Observed sun angle: %.02f" (degrees observed-sun-angle)) -90 -25)
+        ))))
 
 (defn draw-tangent-line []
   (stroke 0 200 0)
   (let [[epx epy] (:earth positions)
         [esx esy] (:earth sizes)
-        angle (state :earth/rotation)]
+        angle (mod (state :earth/rotation)
+                   (* PI 2))
+        tan-angle (mod (+ angle (/ PI 2))
+                       (* PI 2))]
     ;; Perpendicular slopes must be opposite reciprocals of each other:  m1 * m2 = –1
     (with-translation [300 500]
-      (with-rotation [(+ (state :earth/rotation)
-                         (/ PI 2))]
-        (text "Tangent Line" 70 -105))
+      (with-rotation [tan-angle]
+        (text (format "Tangent Line (angle: %.01f)" (degrees tan-angle)) 70 -105))
       (with-rotation [(state :earth/rotation)]
         ;;(tan angle)
         (line 100 -150 100 150)))))
