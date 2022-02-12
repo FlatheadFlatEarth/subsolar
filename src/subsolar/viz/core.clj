@@ -89,8 +89,12 @@
 
 (defn draw-intersolar-distance []
   (stroke 200 0 0)
-  ;(text "Intersolar Distance" 300 150)
-  (line 300 150 300 500))
+  (let [[epx epy] (:earth positions)
+        [spx spy] (:sun positions)]
+    (with-translation [(/ (+ epx spx) 2)
+                       (/ (+ epy spy) 2)]
+      (text "Intersolar Distance" -125 -55))
+    (line 300 150 300 500)))
 
 (defn new-intersolar-dist []
   (let [
@@ -107,13 +111,15 @@
   (stroke 200 0 0)
   (let [[spx spy] (:sun positions)
         [fx fy] (feet-location)
-
         ;; angle
         ]
+
     (line spx spy fx fy)
 
     (arc 100 100 50 50 3.14 6.28)
 
+    (with-translation [(/ (+ fx spx) 2) (/ (+ fy spy) 2)]
+      (text "Line of Sight" 5 0))
     (with-translation [fx fy]
       (with-rotation [(+ (state :earth/rotation)
                          (/ PI 2))]
@@ -158,7 +164,7 @@
   (draw-earth)
   (draw-lines)
 
-  ;;(swap! (state-atom) update :earth/rotation #(+ 0.012 %))
+  (swap! (state-atom) update :earth/rotation #(+ 0.012 %))
   )
 
 (defn on-close []
