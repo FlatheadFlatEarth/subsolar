@@ -54,25 +54,32 @@
     (when (q/loaded? im)
       (q/image im 200 50))))
 
-(defn draw-distance-to-core []
+(defn feet-location []
+  (q/stroke 0 0 50)
+  (let [[epx epy] (:earth positions)
+        h (/ (-> sizes :earth first) 2)
+        angle (q/state :earth/rotation)]
+    [(+ epx
+        (* h (q/cos angle)))
+     (+ epy
+        (* h (q/sin angle)))]))
 
-  )
+(defn draw-distance-to-core []
+  (q/stroke 50 250 0)
+  (let [[epx epy] (:earth positions)
+        [fx fy] (feet-location)]
+    (q/line epx epy fx fy)))
 
 (defn draw-intersolar-distance []
+  (q/stroke 200 0 0)
   (q/line 300 150 300 500))
 
 (defn draw-angle-to-sun []
   (q/stroke 200 0 0)
   (let [[spx spy] (:sun positions)
-        [epx epy] (:earth positions)
-        [esx esy] (:earth sizes)
-        angle (q/state :earth/rotation)
-        h (/ esy 2)]
+        [fx fy] (feet-location)]
     (q/line spx spy
-            (+ epx
-               (* h (q/cos angle)))
-            (+ epy
-               (* h (q/sin angle))))))
+            fx fy)))
 
 (defn draw-tangent-line []
   (q/stroke 0 200 0)
